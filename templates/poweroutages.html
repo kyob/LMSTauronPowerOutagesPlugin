@@ -2,7 +2,6 @@
 {block name=title}::: LMS :{$layout.pagetitle|striphtml} :::{/block}
 {block name=module_content}
 <h1>{trans('Today\'s power outages')}</h1>
-{if count($power_outages['CurrentOutagePeriods'])>1}
 <table class="lmsbox lms-ui-background-cycle">
     <colgroup>
         <COL style="width: 7%;">
@@ -36,14 +35,8 @@
         {/foreach}
     </tbody>
 </table>
-{else}
-<p class="separated bold green">{trans('No submissions.')}</p>
-{/if}
-
-<hr class="blendbg">
 
 <h1>{trans('Planned power outages with 5 days in advance')}</h1>
-{if count($power_outages['FutureOutagePeriods'])>1}
 <table class="lmsbox lms-ui-background-cycle">
     <colgroup>
         <COL style="width: 7%;">
@@ -77,7 +70,4 @@
         {/foreach}
     </tbody>
 </table>
-{else}
-<p class="separated bold green">{trans('No submissions.')}</p>
-{/if}
 {/block}
