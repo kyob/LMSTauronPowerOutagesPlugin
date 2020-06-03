@@ -1,0 +1,83 @@
+{extends file="layout.html"}
+{block name=title}::: LMS :{$layout.pagetitle|striphtml} :::{/block}
+{block name=module_content}
+<h1>{trans('Today\'s power outages')}</h1>
+{if count($power_outages['CurrentOutagePeriods'])>1}
+<table class="lmsbox lms-ui-background-cycle">
+    <colgroup>
+        <COL style="width: 7%;">
+        <COL style="width: 7%;">
+        <COL style="width: 7%;">
+        <COL style="width: 79%;">
+    </colgroup>
+    <thead>
+        <tr>
+            <th>{trans("Day")}</th>
+            <th>{trans("Godziny")}</th>
+            <th>{trans("Disconnection")}</th>
+            <th>{trans("Location")}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {foreach from=$power_outages['CurrentOutagePeriods'] item=item}
+        {if $item['OutageType'] eq 1}
+        {$OutageType = 'planned'}
+        {elseif $item['OutageType'] eq 2}
+        {$OutageType = '>{trans("emergency")}</span>'}
+        {else}
+        {$OutageType = $item['OutageType']}
+        {/if}
+        <tr class="highlight">
+            <td>{$item['StartDate']|date_format:"%Y-%m-%d"}</td>
+            <td>{$item['StartDate']|date_format:"%H:%M"} - {$item['EndDate']|date_format:"%H:%M"}</td>
+            <td {if $item['OutageType'] eq 2} class="alert bold" {/if}>{trans($OutageType)}</td>
+            <td>{$item['Message']}</td>
+        </tr>
+        {/foreach}
+    </tbody>
+</table>
+{else}
+<p class="separated bold green">{trans('No submissions.')}</p>
+{/if}
+
+<hr class="blendbg">
+
+<h1>{trans('Planned power outages with 5 days in advance')}</h1>
+{if count($power_outages['FutureOutagePeriods'])>1}
+<table class="lmsbox lms-ui-background-cycle">
+    <colgroup>
+        <COL style="width: 7%;">
+        <COL style="width: 7%;">
+        <COL style="width: 7%;">
+        <COL style="width: 79%;">
+    </colgroup>
+    <thead>
+        <tr>
+            <th>{trans("Day")}</th>
+            <th>{trans("Godziny")}</th>
+            <th>{trans("Disconnection")}</th>
+            <th>{trans("Location")}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {foreach from=$power_outages['FutureOutagePeriods'] item=item}
+        {if $item['OutageType'] eq 1}
+        {$OutageType = 'planned'}
+        {elseif $item['OutageType'] eq 2}
+        {$OutageType = 'emergency'}
+        {else}
+        {$OutageType = $item['OutageType']}
+        {/if}
+        <tr class="highlight">
+            <td>{$item['StartDate']|date_format:"%Y-%m-%d"}</td>
+            <td>{$item['StartDate']|date_format:"%H:%M"} - {$item['EndDate']|date_format:"%H:%M"}</td>
+            <td {if $item['OutageType'] eq 2} class="alert bold" {/if}>{trans($OutageType)}</td>
+            <td>{$item['Message']}</td>
+        </tr>
+        {/foreach}
+    </tbody>
+</table>
+{else}
+<p class="separated bold green">{trans('No submissions.')}</p>
+{/if}
+{/block}
