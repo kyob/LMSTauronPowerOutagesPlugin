@@ -14,9 +14,9 @@ gaid: 6
 type: district
 */
 
-$gaid = 502;
-$type = 'commune';
-$pathToJSONdata = "https://www.tauron-dystrybucja.pl/iapi/outage/GetOutages?gaid=" . $gaid . "&type=" . $type;
+$gaid = ConfigHelper::getConfig('tauron.gaid',502);
+$type = ConfigHelper::getConfig('tauron.type','commune');
+$api_url = ConfigHelper::getConfig('tauron.api_url','https://www.tauron-dystrybucja.pl/iapi');
 
 function powerOutages($url)
 {
@@ -31,5 +31,5 @@ function powerOutages($url)
     return json_decode($json, true);
 }
 
-$SMARTY->assign('power_outages', powerOutages($pathToJSONdata));
+$SMARTY->assign('power_outages', powerOutages($api_url."/outage/GetOutages?gaid=" . $gaid . "&type=" . $type));
 $SMARTY->display('poweroutages.html');
