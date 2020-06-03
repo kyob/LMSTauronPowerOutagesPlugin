@@ -14,7 +14,7 @@ Shows power outages in areas served by Tauron.
 We need to do some reverse engineering to get result in JSON format.
 
 First open web browser and go to https://www.tauron-dystrybucja.pl/wylaczenia/wylaczenia-oddzialy
-then press F12 in and look for XHR type files to find other locations
+then press F12 in and look for XHR type files to find other locations.
 
 Examples:
 1) miasto Knurów => gaid: 502 => type: commune
