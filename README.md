@@ -4,6 +4,10 @@ Shows power outages in areas served by Tauron.
 
 ![](tauron-power-outages.png?raw=true)
 
+## Requirements
+
+Installed [LMS](https://lms.org.pl/) or [LMS-PLUS](https://lms-plus.org) (recommended).
+
 ## Installation
 
 * Copy files to `<path-to-lms>/plugins/`
