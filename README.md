@@ -22,5 +22,15 @@ Examples:
 
 Of course there are much more variables but this plugin don't cover all of them.
 
+## Configuration
+
+Go to `<path-to-lms>/?m=configlist` then add config parameters and values. Otherway default values will be used.
+
+```
+tauron.gaid = 502
+tauron.type = commune
+taruron.api_url = https://www.tauron-dystrybucja.pl/iapi/
+```
+
 ## Donations :)
 https://github.com/kyob
