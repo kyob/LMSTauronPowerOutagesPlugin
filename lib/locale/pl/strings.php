@@ -1,6 +1,6 @@
 <?php
 
-$_LANG['Power outages'] = 'Wyłączenia energi';
+$_LANG['Power outages'] = 'Wyłączenia energii';
 $_LANG['Disconnection'] = 'Odłączenie';
 $_LANG['planned'] = 'planowane';
 $_LANG['emergency'] = 'awaryjne';
