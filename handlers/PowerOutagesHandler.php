@@ -34,28 +34,18 @@ class PowerOutagesHandler
 
     public function welcomePowerOutages(array $hook_data = array())
     {
-//        $SMARTY = LMSSmarty::getInstance();
-	$SMARTY = $hook_data['smarty'];
-        $gaid = ConfigHelper::getConfig('tauron.gaid');
-        $type = ConfigHelper::getConfig('tauron.type');
-        $api_url = ConfigHelper::getConfig('tauron.api_url');
+        // uncomment if you have current LMS version
+        // $SMARTY = LMSSmarty::getInstance();
 
-        if (!$gaid) {
-            $gaid = 502;
-        }
+        // uncomment if you have old LMS version
+        $SMARTY = $hook_data['smarty'];
 
-        if (!$type) {
-            $type = 'commune';
-        }
-
-        if (!$api_url) {
-            $api_url = 'https://www.tauron-dystrybucja.pl/iapi/';
-        }
-
-        $full_url = $api_url . '/outage/GetOutages?gaid=' . $gaid . '&type=' . $type;
+        $gaid = ConfigHelper::getConfig('tauron.gaid', 502);
+        $type = ConfigHelper::getConfig('tauron.type', 'commune');
+        $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/iapi');
 
         $CURLConnection = curl_init();
-        curl_setopt($CURLConnection, CURLOPT_URL, $full_url);
+        curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=" . $type);
         curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
         $json = curl_exec($CURLConnection);
         curl_close($CURLConnection);
