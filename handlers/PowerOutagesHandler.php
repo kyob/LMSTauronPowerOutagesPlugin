@@ -34,8 +34,8 @@ class PowerOutagesHandler
 
     public function welcomePowerOutages(array $hook_data = array())
     {
-        $SMARTY = LMSSmarty::getInstance();
-
+//        $SMARTY = LMSSmarty::getInstance();
+	$SMARTY = $hook_data['smarty'];
         $gaid = ConfigHelper::getConfig('tauron.gaid');
         $type = ConfigHelper::getConfig('tauron.type');
         $api_url = ConfigHelper::getConfig('tauron.api_url');
