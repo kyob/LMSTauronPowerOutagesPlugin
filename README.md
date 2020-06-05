@@ -1,4 +1,4 @@
-# LMS plugin PowerOutages
+# LMS Tauron Power Outages plugin
 
 Shows power outages in areas served by Tauron.
 
@@ -13,7 +13,6 @@ Installed [LMS](https://lms.org.pl/) or [LMS-PLUS](https://lms-plus.org) (recomm
 * Copy files to `<path-to-lms>/plugins/`
 * Run `composer update` or `composer update --no-dev`
 * Go to LMS website and activate it `Configuration => Plugins`
-* Set data with best suits to you in file `modules/poweroutages.php`
 
 ## How to add your area?
 
