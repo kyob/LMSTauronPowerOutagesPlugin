@@ -24,7 +24,7 @@
                 {if $item.OutageType eq 1}
                     {$OutageType = 'planned'}
                 {elseif $item.OutageType eq 2}
-                    {$OutageType = '>{trans("emergency")}</span>'}
+                    {$OutageType = 'emergency'}
                 {else}
                     {$OutageType = $item.OutageType}
                 {/if}
