@@ -29,11 +29,10 @@ Of course there are much more variables but this plugin don't cover all of them.
 
 ## Configuration
 
-Go to `<path-to-lms>/?m=configlist` then add config parameters and values. Otherway default values will be used.
-
+Go to `<path-to-lms>/?m=configlist` then add config parameters and values. You can use more than one value separate with comma. Example config below:
 ```
-tauron.gaid = 502
-tauron.type = commune
+tauron.commune = 501,502,503
+tauron.district = 4,5,6
 taruron.api_url = https://www.tauron-dystrybucja.pl/iapi/
 ```
 
