@@ -41,10 +41,10 @@ class TauronPowerOutagesHandler
         //$SMARTY = $hook_data['smarty'];
 
         $commune = ConfigHelper::getConfig('tauron.commune');
-        $commune = explode(",", (int) $commune);
+        $commune = explode(",", $commune);
 
         $district = ConfigHelper::getConfig('tauron.district');
-        $district = explode(",", (int) $district);
+        $district = explode(",", $district);
 
         $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/iapi');
         $array = array();
@@ -61,7 +61,6 @@ class TauronPowerOutagesHandler
         foreach ($district as $gaid) {
             curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=district");
             curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
-            $json = curl_exec($CURLConnection);
             $json = curl_exec($CURLConnection);
             $array = array_merge_recursive($array, json_decode($json, true));
         }
