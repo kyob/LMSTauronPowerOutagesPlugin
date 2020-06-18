@@ -30,7 +30,11 @@ class LMSTauronPowerOutagesPlugin extends LMSPlugin
             'welcome_before_module_display' => array(
                 'class' => 'TauronPowerOutagesHandler',
                 'method' => 'welcomeTauronPowerOutages'
-            )
+            ),
+            'access_table_initialized' => array(
+                'class' => 'TauronPowerOutagesHandler',
+                'method' => 'accessTableInit'
+            ),
         );
     }
 }

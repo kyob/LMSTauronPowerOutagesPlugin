@@ -1,79 +1,93 @@
 {block name="extra-panel"}
-    <table class="lmsbox lms-ui-background-cycle">
-        <colgroup>
-            <col style="width: 7%;">
-            <col style="width: 7%;">
-            <col style="width: 7%;">
-            <col style="width: 79%;">
-        </colgroup>
+    <table class="lmsbox" id="lms-ui-welcome-box-tauron">
         <thead>
-            <tr>
-                <th colspan="4" class="text-center">
-                    {trans('Today\'s power outages')}
-                </th>
-            </tr>
-            <tr>
-                <th>{trans("Day")}</th>
-                <th>{trans("Godziny")}</th>
-                <th>{trans("Disconnection")}</th>
-                <th>{trans("Location")}</th>
+            <tr onclick="showOrHide('welcome_tauron');">
+                <td class="text-center bold">
+                    <i class="fas fa-bolt"></i> {trans('Power outages')}
+                </td>
             </tr>
         </thead>
-        <tbody>
-            {foreach from=$power_outages.CurrentOutagePeriods item=item}
-                {if $item.OutageType eq 1}
-                    {$OutageType = 'planned'}
-                {elseif $item.OutageType eq 2}
-                    {$OutageType = 'emergency'}
-                {else}
-                    {$OutageType = $item.OutageType}
-                {/if}
-                <tr class="highlight">
-                    <td>{$item.StartDate|date_format:"%Y-%m-%d"}</td>
-                    <td>{$item.StartDate|date_format:"%H:%M"} - {$item.EndDate|date_format:"%H:%M"}</td>
-                    <td {if $item.OutageType eq 2} class="alert bold" {/if}>{trans($OutageType)}</td>
-                    <td>{$item.Message}</td>
+        <tbody id="welcome_tauron" {if empty($power_outages.CurrentOutagePeriods)}style="display:none;" {/if}}>
+            {if !empty($power_outages.CurrentOutagePeriods)}
+                <tr>
+                    <td style="padding:1em;">
+                        <p class="bold"> {trans('Today\'s power outages')}</p>
+                        <table class="lmsbox lms-ui-background-cycle">
+                            <colgroup>
+                                <col style="width: 7%;">
+                                <col style="width: 7%;">
+                                <col style="width: 7%;">
+                                <col style="width: 79%;">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>{trans("Day")}</th>
+                                    <th>{trans("Godziny")}</th>
+                                    <th>{trans("Disconnection")}</th>
+                                    <th>{trans("Location")}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach from=$power_outages.CurrentOutagePeriods item=item}
+                                    {if $item.OutageType eq 1}
+                                        {$OutageType = 'planned'}
+                                    {elseif $item.OutageType eq 2}
+                                        {$OutageType = 'emergency'}
+                                    {else}
+                                        {$OutageType = $item.OutageType}
+                                    {/if}
+                                    <tr class="highlight">
+                                        <td>{$item.StartDate|date_format:"%Y-%m-%d"}</td>
+                                        <td>{$item.StartDate|date_format:"%H:%M"} - {$item.EndDate|date_format:"%H:%M"}</td>
+                                        <td {if $item.OutageType eq 2} class="alert bold" {/if}>{trans($OutageType)}</td>
+                                        <td>{$item.Message}</td>
+                                    </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </td>
                 </tr>
-            {/foreach}
+            {/if}
+            {if !empty($power_outages.FutureOutagePeriods)}
+                <tr>
+                    <td style="padding:1em;">
+                        <p class="bold">{trans('Planned power outages with 5 days in advance')}</p>
+                        <table class="lmsbox lms-ui-background-cycle">
+                            <colgroup>
+                                <col style="width: 7%;">
+                                <col style="width: 7%;">
+                                <col style="width: 7%;">
+                                <col style="width: 79%;">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>{trans("Day")}</th>
+                                    <th>{trans("Godziny")}</th>
+                                    <th>{trans("Disconnection")}</th>
+                                    <th>{trans("Location")}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach from=$power_outages.FutureOutagePeriods item=item}
+                                    {if $item.OutageType eq 1}
+                                        {$OutageType = 'planned'}
+                                    {elseif $item.OutageType eq 2}
+                                        {$OutageType = 'emergency'}
+                                    {else}
+                                        {$OutageType = $item.OutageType}
+                                    {/if}
+                                    <tr class="highlight">
+                                        <td>{$item.StartDate|date_format:"%Y-%m-%d"}</td>
+                                        <td>{$item.StartDate|date_format:"%H:%M"} - {$item.EndDate|date_format:"%H:%M"}</td>
+                                        <td {if $item.OutageType eq 2} class="alert bold" {/if}>{trans($OutageType)}</td>
+                                        <td>{$item.Message}</td>
+                                    </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            {/if}
         </tbody>
     </table>
-
-<table class="lmsbox lms-ui-background-cycle">
-    <colgroup>
-        <col style="width: 7%;">
-        <col style="width: 7%;">
-        <col style="width: 7%;">
-        <col style="width: 79%;">
-    </colgroup>
-    <thead>
-        <tr>
-            <th colspan="4" class="text-center">
-                {trans('Planned power outages with 5 days in advance')}
-            </th>
-        </tr>
-        <tr>
-            <th>{trans("Day")}</th>
-            <th>{trans("Godziny")}</th>
-            <th>{trans("Disconnection")}</th>
-            <th>{trans("Location")}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {foreach from=$power_outages.FutureOutagePeriods item=item}
-        {if $item.OutageType eq 1}
-        {$OutageType = 'planned'}
-        {elseif $item.OutageType eq 2}
-        {$OutageType = 'emergency'}
-        {else}
-        {$OutageType = $item.OutageType}
-        {/if}
-        <tr class="highlight">
-            <td>{$item.StartDate|date_format:"%Y-%m-%d"}</td>
-            <td>{$item.StartDate|date_format:"%H:%M"} - {$item.EndDate|date_format:"%H:%M"}</td>
-            <td {if $item.OutageType eq 2} class="alert bold" {/if}>{trans($OutageType)}</td>
-            <td>{$item.Message}</td>
-        </tr>
-        {/foreach}
-    </tbody>
-</table>
 {/block}

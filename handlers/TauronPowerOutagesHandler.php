@@ -58,16 +58,33 @@ class TauronPowerOutagesHandler
             $array = array_merge_recursive($array, json_decode($json, true));
         }
 
+        $commune_current_count = count($array['CurrentOutagePeriods']);
+        $commune_future_count = count($array['FutureOutagePeriods']);
+
         foreach ($district as $gaid) {
             curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=district");
             curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
             $json = curl_exec($CURLConnection);
             $array = array_merge_recursive($array, json_decode($json, true));
         }
+        $district_current_count = count($array['CurrentOutagePeriods']);
+        $district_future_count = count($array['FutureOutagePeriods']);
 
         curl_close($CURLConnection);
-        
+
         $SMARTY->assign('power_outages', $array);
+        $SMARTY->assign('power_outages_current_count', $commune_current_count + $district_current_count);
+        $SMARTY->assign('power_outages_future_count', $commune_future_countray + $district_future_count);
         return $hook_data;
+    }
+
+    public function accessTableInit()
+    {
+        $access = AccessRights::getInstance();
+        $access->insertPermission(new Permission(
+            'tauronpoweroutages_full_access',
+            trans('Tauron power outages'),
+            '^tauronpoweroutages$'
+        ), AccessRights::FIRST_FORBIDDEN_PERMISSION);
     }
 }
