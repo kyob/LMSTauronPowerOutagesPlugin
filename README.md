@@ -1,4 +1,4 @@
-# LMS Tauron Power Outages plugin
+# TauronPowerOutage plugin dla LMS
 
 Shows power outages in areas served by Tauron.
 
@@ -36,5 +36,7 @@ tauron.district = 4,5,6
 taruron.api_url = https://www.tauron-dystrybucja.pl/iapi/
 ```
 
-## Donations :)
-https://github.com/kyob
+## Donation
+
+* Bitcoin (BTC): bc1qvwahntcrwjtdp0ntfd0l6kdvdr9d9h6atp6qrr
+* Ethereum (ETH): 0xEFCd4b066195652a885d916183ffFfeEEd931f40

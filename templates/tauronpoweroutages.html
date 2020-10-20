@@ -70,4 +70,34 @@
         {/foreach}
     </tbody>
 </table>
+<input type="button" value="{t}Support the author with a tip.{/t}" class="btn-donate" onclick="showOrHide('donate');">
+<div id="donate" class="bg-donate" style="display:none;">
+    <ul>
+        <li>{t}Bitcoin (BTC){/t}: bc1qvwahntcrwjtdp0ntfd0l6kdvdr9d9h6atp6qrr</li>
+        <li>{t}Ethereum (ETH){/t}: 0xEFCd4b066195652a885d916183ffFfeEEd931f40</li>
+    </ul>
+</div>
+
+<style>
+    .bg-donate {
+        color: black;
+        background: ghostwhite;
+        border: 1px solid gray;
+        padding: 1em;
+    }
+
+    input.btn-donate {
+        color: #333;
+        font-weight: bold;
+        background: #eee;
+        padding: 5px 10px 5px 10px;
+        border: 1px solid gray;
+        text-decoration: none;
+    }
+
+    input.btn-donate:hover {
+        background: #fff;
+        text-decoration: none;
+    }
+</style>
 {/block}
