@@ -33,7 +33,7 @@ Go to `<path-to-lms>/?m=configlist` then add config parameters and values. You c
 ```
 tauron.commune = 501,502,503
 tauron.district = 4,5,6
-taruron.api_url = https://www.tauron-dystrybucja.pl/iapi/
+tauron.api_url = https://www.tauron-dystrybucja.pl/iapi/
 ```
 
 ## Donation
