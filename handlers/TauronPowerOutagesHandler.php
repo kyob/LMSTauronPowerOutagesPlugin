@@ -47,7 +47,7 @@ class TauronPowerOutagesHandler
         $district = explode(",", $district);
 
         $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/iapi');
-        $array = array();
+        $outages = array();
 
         $CURLConnection = curl_init();
 
@@ -55,26 +55,27 @@ class TauronPowerOutagesHandler
             curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=commune");
             curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
             $json = curl_exec($CURLConnection);
-            $array = array_merge_recursive($array, json_decode($json, true));
+            $outages = array_merge_recursive($outages, json_decode($json, true));
         }
 
-        $commune_current_count = count($array['CurrentOutagePeriods']);
-        $commune_future_count = count($array['FutureOutagePeriods']);
+        $commune_current_count = (is_array($outages['CurrentOutagePeriods'])) ? count($outages['CurrentOutagePeriods']) : false;
+        $commune_current_count = (is_array($outages['FutureOutagePeriods'])) ? count($outages['FutureOutagePeriods']) : false;
 
         foreach ($district as $gaid) {
             curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=district");
             curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
             $json = curl_exec($CURLConnection);
-            $array = array_merge_recursive($array, json_decode($json, true));
+            $outages = array_merge_recursive($outages, json_decode($json, true));
         }
-        $district_current_count = count($array['CurrentOutagePeriods']);
-        $district_future_count = count($array['FutureOutagePeriods']);
+
+        $district_current_count = (is_array($outages['CurrentOutagePeriods'])) ? count($outages['CurrentOutagePeriods']) : false;
+        $district_future_count = (is_array($outages['FutureOutagePeriods'])) ? count($outages['FutureOutagePeriods']) : false;
 
         curl_close($CURLConnection);
 
-        $SMARTY->assign('power_outages', $array);
+        $SMARTY->assign('power_outages', $outages);
         $SMARTY->assign('power_outages_current_count', $commune_current_count + $district_current_count);
-        $SMARTY->assign('power_outages_future_count', $commune_future_countray + $district_future_count);
+        $SMARTY->assign('power_outages_future_count', $commune_future_count + $district_future_count);
         return $hook_data;
     }
 
