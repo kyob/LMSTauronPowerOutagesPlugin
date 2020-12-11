@@ -1,6 +1,6 @@
 <?php
 
-function powerOutages($url)
+function tauronPowerOutages($url)
 {
     $debug=array();
     $commune = explode(",", ConfigHelper::getConfig('tauron.commune'));
@@ -34,5 +34,5 @@ function powerOutages($url)
     return $result;
 }
 
-$SMARTY->assign('power_outages', powerOutages($api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=" . $type));
+$SMARTY->assign('tauron_power_outages', tauronPowerOutages($api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=" . $type));
 $SMARTY->display('tauronpoweroutages.html');

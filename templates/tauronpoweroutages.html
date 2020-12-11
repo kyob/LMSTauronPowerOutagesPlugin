@@ -18,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-            {foreach from=$power_outages['CurrentOutagePeriods'] item=item}
+            {foreach from=$tauron_power_outages['CurrentOutagePeriods'] item=item}
                 {if $item['OutageType'] eq 1}
                     {$OutageType = 'planned'}
                 {elseif $item['OutageType'] eq 2}
@@ -53,7 +53,7 @@
         </tr>
     </thead>
     <tbody>
-        {foreach from=$power_outages['FutureOutagePeriods'] item=item}
+        {foreach from=$tauron_power_outages['FutureOutagePeriods'] item=item}
         {if $item['OutageType'] eq 1}
         {$OutageType = 'planned'}
         {elseif $item['OutageType'] eq 2}

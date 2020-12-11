@@ -73,7 +73,7 @@ class TauronPowerOutagesHandler
 
         curl_close($CURLConnection);
 
-        $SMARTY->assign('power_outages', $outages);
+        $SMARTY->assign('tauron_power_outages', $outages);
         $SMARTY->assign('power_outages_current_count', $commune_current_count + $district_current_count);
         $SMARTY->assign('power_outages_future_count', $commune_future_count + $district_future_count);
         return $hook_data;
