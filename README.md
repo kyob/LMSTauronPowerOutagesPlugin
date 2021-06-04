@@ -31,7 +31,7 @@ Of course there are much more variables but this plugin don't cover all of them.
 ## Configuration
 
 * Import default settings `configexport-tauron-wartoscglobalna.ini`
-* Go to ``<path-to-lms>/?m=configlist` adjust the settings for yourself
+* Go to `<path-to-lms>/?m=configlist` adjust the settings for yourself
 
 ## Donation
 
