@@ -2,13 +2,14 @@
     <table class="lmsbox" id="lms-ui-welcome-box-tauron">
         <thead>
             <tr onclick="showOrHide('welcome_tauron');">
-                <th class="text-center bold">
-                    <i class="fas fa-bolt"></i> {trans('Power outages')}
+                <th class="text-center">
+                    <i class="fas fa-bolt"></i> {trans('Power outages')} - ostatnia aktualizacja
+                    {$tauron_power_outages['last_updated_cache']}
                 </th>
             </tr>
         </thead>
-        <tbody id="welcome_tauron" {if empty($tauron_power_outages.CurrentOutagePeriods)}style="display:none;" {/if}}>
-            {if !empty($tauron_power_outages.CurrentOutagePeriods)}
+        <tbody id="welcome_tauron" {if !$tauron_power_outages['outages_count']>0}style="display:none;" {/if}}>
+            {if !empty($tauron_power_outages.outages.CurrentOutagePeriods)}
                 <tr>
                     <td style="padding:1em;">
                         <p class="bold"> {trans('Today\'s power outages')}</p>
@@ -28,7 +29,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {foreach from=$tauron_power_outages.CurrentOutagePeriods item=item}
+                                {foreach from=$tauron_power_outages.outages.CurrentOutagePeriods item=item}
                                     {if $item.OutageType eq 1}
                                         {$OutageType = 'planned'}
                                     {elseif $item.OutageType eq 2}
@@ -48,7 +49,7 @@
                     </td>
                 </tr>
             {/if}
-            {if !empty($tauron_power_outages.FutureOutagePeriods)}
+            {if !empty($tauron_power_outages.outages.FutureOutagePeriods)}
                 <tr>
                     <td style="padding:1em;">
                         <p class="bold">{trans('Planned power outages with 5 days in advance')}</p>
@@ -68,7 +69,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {foreach from=$tauron_power_outages.FutureOutagePeriods item=item}
+                                {foreach from=$tauron_power_outages.outages.FutureOutagePeriods item=item}
                                     {if $item.OutageType eq 1}
                                         {$OutageType = 'planned'}
                                     {elseif $item.OutageType eq 2}

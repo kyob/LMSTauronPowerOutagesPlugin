@@ -14,6 +14,7 @@ Installed [LMS](https://lms.org.pl/) or [LMS-PLUS](https://lms-plus.org) (recomm
 * Run `composer update` or `composer update --no-dev`
 * Go to LMS website and activate it `Configuration => Plugins`
 
+
 ## How to add your area?
 
 We need to do some reverse engineering to get result in JSON format.
@@ -29,12 +30,8 @@ Of course there are much more variables but this plugin don't cover all of them.
 
 ## Configuration
 
-Go to `<path-to-lms>/?m=configlist` then add config parameters and values. You can use more than one value separate with comma. Example config below:
-```
-tauron.commune = 501,502,503
-tauron.district = 4,5,6
-tauron.api_url = https://www.tauron-dystrybucja.pl/iapi/
-```
+* Import default settings `configexport-tauron-wartoscglobalna.ini`
+* Go to ``<path-to-lms>/?m=configlist` adjust the settings for yourself
 
 ## Donation
 

@@ -2,20 +2,6 @@
 
 class TauronPowerOutagesHandler
 {
-    public function menuTauronPowerOutages(array $hook_data = array())
-    {
-        $submenus = array(
-            array(
-                'name' => trans('Tauron power outages'),
-                'link' => '?m=tauronpoweroutages',
-                'tip' => trans('Tauron power outages'),
-                'prio' => 150,
-            ),
-        );
-        $hook_data['admin']['submenu'] = array_merge($hook_data['admin']['submenu'], $submenus);
-        return $hook_data;
-    }
-
     public function smartyTauronPowerOutages(Smarty $hook_data)
     {
         $template_dirs = $hook_data->getTemplateDir();
@@ -40,42 +26,60 @@ class TauronPowerOutagesHandler
         // uncomment if you have old LMS version
         //$SMARTY = $hook_data['smarty'];
 
-        $commune = ConfigHelper::getConfig('tauron.commune');
+        $filename = ConfigHelper::getConfig('tauron.filename','tauron.json');
+        $time_in_cache = ConfigHelper::getConfig('tauron.time_in_cache',60);
+
+        if (file_exists($filename)) {
+            $last_updated_cache = filemtime($filename);
+        } else {
+            $last_updated_cache = 0;
+        }
+
+        $commune = ConfigHelper::getConfig('tauron.commune',502);
         $commune = explode(",", $commune);
 
-        $district = ConfigHelper::getConfig('tauron.district');
+        $district = ConfigHelper::getConfig('tauron.district',6);
         $district = explode(",", $district);
 
         $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/iapi');
         $outages = array();
 
-        $CURLConnection = curl_init();
+        if ((time() - $last_updated_cache) > $time_in_cache) {
 
-        foreach ($commune as $gaid) {
-            curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=commune");
-            curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
-            $json = curl_exec($CURLConnection);
-            $outages = array_merge_recursive($outages, json_decode($json, true));
+            $CURLConnection = curl_init();
+
+            foreach ($commune as $gaid) {
+                curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=commune");
+                curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
+                $json = curl_exec($CURLConnection);
+                $outages = array_merge_recursive($outages, json_decode($json, true));
+            }
+
+            foreach ($district as $gaid) {
+                curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=district");
+                curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
+                $json = curl_exec($CURLConnection);
+                $outages = array_merge_recursive($outages, json_decode($json, true));
+            }
+
+            curl_close($CURLConnection);
+            $json = json_encode($outages);
+
+            if (!file_put_contents($filename, $json)) {
+                echo "Oops! Error creating json file $filename";
+            }
         }
+        $outages = file_get_contents($filename);
+        $outages = json_decode($outages, true);
 
-        $commune_current_count = (is_array($outages['CurrentOutagePeriods'])) ? count($outages['CurrentOutagePeriods']) : false;
-        $commune_current_count = (is_array($outages['FutureOutagePeriods'])) ? count($outages['FutureOutagePeriods']) : false;
-
-        foreach ($district as $gaid) {
-            curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outage/GetOutages?gaid=" . $gaid . "&type=district");
-            curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
-            $json = curl_exec($CURLConnection);
-            $outages = array_merge_recursive($outages, json_decode($json, true));
-        }
-
-        $district_current_count = (is_array($outages['CurrentOutagePeriods'])) ? count($outages['CurrentOutagePeriods']) : false;
-        $district_future_count = (is_array($outages['FutureOutagePeriods'])) ? count($outages['FutureOutagePeriods']) : false;
-
-        curl_close($CURLConnection);
-
-        $SMARTY->assign('tauron_power_outages', $outages);
-        $SMARTY->assign('power_outages_current_count', $commune_current_count + $district_current_count);
-        $SMARTY->assign('power_outages_future_count', $commune_future_count + $district_future_count);
+        $SMARTY->assign(
+            'tauron_power_outages',
+            array(
+                'outages' => $outages,
+                'outages_count' => count($outages['CurrentOutagePeriods']) + count($outages['FutureOutagePeriods']),
+                'last_updated_cache' => date("Y-m-d H:i:s", filemtime($filename)),
+            )
+        );
         return $hook_data;
     }
 
