@@ -15,10 +15,6 @@ class LMSTauronPowerOutagesPlugin extends LMSPlugin
     public function registerHandlers()
     {
         $this->handlers = array(
-            'menu_initialized' => array(
-                'class' => 'TauronPowerOutagesHandler',
-                'method' => 'menuTauronPowerOutages'
-            ),
             'smarty_initialized' => array(
                 'class' => 'TauronPowerOutagesHandler',
                 'method' => 'smartyTauronPowerOutages'
