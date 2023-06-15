@@ -88,8 +88,8 @@ class TauronPowerOutagesHandler
         $SMARTY->assign(
             'tauron_power_outages',
             array(
-                'outages' => $outages,
-                'outages_count' => count($outages['CurrentOutagePeriods']) + count($outages['FutureOutagePeriods']),
+                'outages' => $outages['OutageItems'],
+                'outages_count' => count($outages['OutageItems']),
                 'last_updated_cache' => date("Y-m-d H:i:s", filemtime($filename)),
             )
         );
