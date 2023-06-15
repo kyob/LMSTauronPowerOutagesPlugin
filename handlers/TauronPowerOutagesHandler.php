@@ -44,12 +44,15 @@ class TauronPowerOutagesHandler
         $province = ConfigHelper::getConfig('tauron.province',12);
         $province = explode(",", $province);
         
-        $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/waapi');
+        $forwardDays = ConfigHelper::getConfig('tauron.forward_days',5);
+        $forwardTimeSeconds = intval($forwardDays) * 24 * 60 * 60; $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/waapi');
+        
         $outages = array();
 
         if ((time() - $last_updated_cache) > $time_in_cache) {
 
-            $queryDateTime = date("Y-m-d") . "T" . date("H:i") . ":00.000Z";
+            $queryDateTimeStart = date("Y-m-d") . "T" . date("H") . "%3A" . date("i") . "%3A00.000Z";
+            $queryDateTimeStop = date("Y-m-d", time() + $forwardTimeSeconds) . "T" . date("H") . "%3A" . date("i") . "%3A00.000Z";
             
             $CURLConnection = curl_init();
 
@@ -57,14 +60,14 @@ class TauronPowerOutagesHandler
                 foreach ($district as $districtGAID) {
                     if (!empty($commune)) {
                         foreach ($commune as $communeGAID) {
-                            curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTime . "&toDate=" . $queryDateTime . "&communeGAID=" . $communeGAID);
+                            curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop . "&communeGAID=" . $communeGAID);
                             curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
                             $json = curl_exec($CURLConnection);
                             $outages = array_merge_recursive($outages, json_decode($json, true));
                         }
                     }
                     else {
-                            curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTime . "&toDate=" . $queryDateTime);
+                            curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop);
                             curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
                             $json = curl_exec($CURLConnection);
                             $outages = array_merge_recursive($outages, json_decode($json, true));
