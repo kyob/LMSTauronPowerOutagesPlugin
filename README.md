@@ -1,3 +1,6 @@
+# UWAGA! TAURON przbudował swoją stronę i nie udostępnia już w sposób jawny informacji o wyłączeniach. W konsekwencji plugin aktualnie jest bezużyteczny.
+
+
 # TauronPowerOutage plugin dla LMS
 
 Shows power outages in areas served by Tauron.
