@@ -3,44 +3,32 @@
         <thead>
             <tr onclick="showOrHide('welcome_tauron');">
                 <th class="text-center">
-                    <i class="fas fa-bolt"></i> {trans('Power outages')} - ostatnia aktualizacja
-                    {$tauron_power_outages['last_updated_cache']}
+                    <i class="fas fa-bolt"></i> {trans('Power outages')} - ostatnia aktualizacja {$tauron_power_outages.last_updated_cache}
                 </th>
             </tr>
         </thead>
-        <tbody id="welcome_tauron" {if !$tauron_power_outages['outages_count']>0}style="display:none;" {/if}}>
-            {if !empty($tauron_power_outages.outages.CurrentOutagePeriods)}
+        <tbody id="welcome_tauron" {if !$tauron_power_outages.outages_count > 0}style="display:none;" {/if}>
+            {if $tauron_power_outages.outages}
                 <tr>
                     <td style="padding:1em;">
-                        <p class="bold"> {trans('Today\'s power outages')}</p>
                         <table class="lmsbox lms-ui-background-cycle">
                             <colgroup>
-                                <col style="width: 7%;">
-                                <col style="width: 7%;">
-                                <col style="width: 7%;">
-                                <col style="width: 79%;">
+                                <col style="width: 10%;">
+                                <col style="width: 10%;">
+                                <col style="width: 80%;">
                             </colgroup>
                             <thead>
                                 <tr>
                                     <th>{trans("Day")}</th>
                                     <th>{trans("Godziny")}</th>
-                                    <th>{trans("Disconnection")}</th>
                                     <th>{trans("Location")}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {foreach from=$tauron_power_outages.outages.CurrentOutagePeriods item=item}
-                                    {if $item.OutageType eq 1}
-                                        {$OutageType = 'planned'}
-                                    {elseif $item.OutageType eq 2}
-                                        {$OutageType = 'emergency'}
-                                    {else}
-                                        {$OutageType = $item.OutageType}
-                                    {/if}
-                                    <tr class="highlight">
+                                {foreach $tauron_power_outages.outages as $item}
+                                    <tr class="highlight{if $item.StartDate|date_format:'%Y-%m-%d' == date('Y-m-d')} alert bold{/if}">
                                         <td>{$item.StartDate|date_format:"%Y-%m-%d"}</td>
                                         <td>{$item.StartDate|date_format:"%H:%M"} - {$item.EndDate|date_format:"%H:%M"}</td>
-                                        <td {if $item.OutageType eq 2} class="alert bold" {/if}>{trans($OutageType)}</td>
                                         <td>{$item.Message}</td>
                                     </tr>
                                 {/foreach}
