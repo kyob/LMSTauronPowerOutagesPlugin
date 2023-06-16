@@ -29,9 +29,10 @@ class TauronPowerOutagesHandler
             $last_updated_cache = filemtime($filename);
         }
 
-        $commune = explode(",", ConfigHelper::getConfig('tauron.commune', '502'));
+        $commune = explode(",", ConfigHelper::getConfig('tauron.commune'));
         $district = explode(",", ConfigHelper::getConfig('tauron.district', '6'));
         $province = explode(",", ConfigHelper::getConfig('tauron.province', '24'));
+
         $forwardDays = intval(ConfigHelper::getConfig('tauron.forward_days', 7));
         $forwardTimeSeconds = $forwardDays * 24 * 60 * 60;
         $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/waapi');
@@ -45,8 +46,16 @@ class TauronPowerOutagesHandler
 
             foreach ($province as $provinceGAID) {
                 foreach ($district as $districtGAID) {
-                    foreach ($commune as $communeGAID) {
-                        $url = $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop . "&communeGAID=" . $communeGAID;
+                    if ($communeGAID !== null) {
+                        foreach ($commune as $communeGAID) {
+                            $url = $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop . "&communeGAID=" . $communeGAID;
+                            curl_setopt($CURLConnection, CURLOPT_URL, $url);
+                            curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
+                            $json = curl_exec($CURLConnection);
+                            $outages = array_merge_recursive($outages, json_decode($json, true));
+                        }
+                    } else {
+                        $url = $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop;
                         curl_setopt($CURLConnection, CURLOPT_URL, $url);
                         curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
                         $json = curl_exec($CURLConnection);
@@ -64,7 +73,7 @@ class TauronPowerOutagesHandler
         }
 
         $outages = json_decode(file_get_contents($filename), true);
-        $outageItems = $outages['OutageItems'];
+        $outageItems = isset($outages['OutageItems']) ? $outages['OutageItems'] : array();
         $outagesCount = is_array($outageItems) ? count($outageItems) : 0;
 
         $SMARTY->assign(
@@ -78,6 +87,7 @@ class TauronPowerOutagesHandler
 
         return $hook_data;
     }
+
 
 
     public function accessTableInit()
