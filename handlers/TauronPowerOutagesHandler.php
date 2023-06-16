@@ -64,12 +64,14 @@ class TauronPowerOutagesHandler
         }
 
         $outages = json_decode(file_get_contents($filename), true);
+        $outageItems = $outages['OutageItems'];
+        $outagesCount = is_array($outageItems) ? count($outageItems) : 0;
 
         $SMARTY->assign(
             'tauron_power_outages',
             array(
                 'outages' => $outages['OutageItems'],
-                'outages_count' => count($outages['OutageItems']),
+                'outages_count' => $outagesCount,
                 'last_updated_cache' => date("Y-m-d H:i:s", filemtime($filename)),
             )
         );
