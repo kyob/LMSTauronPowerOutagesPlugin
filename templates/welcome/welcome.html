@@ -49,46 +49,6 @@
                     </td>
                 </tr>
             {/if}
-            {if !empty($tauron_power_outages.outages.FutureOutagePeriods)}
-                <tr>
-                    <td style="padding:1em;">
-                        <p class="bold">{trans('Planned power outages with 5 days in advance')}</p>
-                        <table class="lmsbox lms-ui-background-cycle">
-                            <colgroup>
-                                <col style="width: 7%;">
-                                <col style="width: 7%;">
-                                <col style="width: 7%;">
-                                <col style="width: 79%;">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>{trans("Day")}</th>
-                                    <th>{trans("Godziny")}</th>
-                                    <th>{trans("Disconnection")}</th>
-                                    <th>{trans("Location")}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {foreach from=$tauron_power_outages.outages.FutureOutagePeriods item=item}
-                                    {if $item.OutageType eq 1}
-                                        {$OutageType = 'planned'}
-                                    {elseif $item.OutageType eq 2}
-                                        {$OutageType = 'emergency'}
-                                    {else}
-                                        {$OutageType = $item.OutageType}
-                                    {/if}
-                                    <tr class="highlight">
-                                        <td>{$item.StartDate|date_format:"%Y-%m-%d"}</td>
-                                        <td>{$item.StartDate|date_format:"%H:%M"} - {$item.EndDate|date_format:"%H:%M"}</td>
-                                        <td {if $item.OutageType eq 2} class="alert bold" {/if}>{trans($OutageType)}</td>
-                                        <td>{$item.Message}</td>
-                                    </tr>
-                                {/foreach}
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            {/if}
         </tbody>
     </table>
 {/block}
