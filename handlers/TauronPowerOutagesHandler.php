@@ -20,14 +20,10 @@ class TauronPowerOutagesHandler
 
     public function welcomeTauronPowerOutages(array $hook_data = array())
     {
-        // uncomment if you have current LMS version
         $SMARTY = LMSSmarty::getInstance();
 
-        // uncomment if you have old LMS version
-        //$SMARTY = $hook_data['smarty'];
-
-        $filename = ConfigHelper::getConfig('tauron.filename','tauron.json');
-        $time_in_cache = ConfigHelper::getConfig('tauron.time_in_cache',60);
+        $filename = ConfigHelper::getConfig('tauron.filename', 'tauron.json');
+        $time_in_cache = ConfigHelper::getConfig('tauron.time_in_cache', 60);
 
         if (file_exists($filename)) {
             $last_updated_cache = filemtime($filename);
@@ -35,42 +31,35 @@ class TauronPowerOutagesHandler
             $last_updated_cache = 0;
         }
 
-        $commune = ConfigHelper::getConfig('tauron.commune');
+        $commune = ConfigHelper::getConfig('tauron.commune', 502);
         $commune = explode(",", $commune);
 
-        $district = ConfigHelper::getConfig('tauron.district',6);
+        $district = ConfigHelper::getConfig('tauron.district', 6);
         $district = explode(",", $district);
 
-        $province = ConfigHelper::getConfig('tauron.province',12);
+        $province = ConfigHelper::getConfig('tauron.province', 24);
         $province = explode(",", $province);
-        
-        $forwardDays = ConfigHelper::getConfig('tauron.forward_days',5);
-        $forwardTimeSeconds = intval($forwardDays) * 24 * 60 * 60; $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/waapi');
-        
+
+        $forwardDays = ConfigHelper::getConfig('tauron.forward_days', 5);
+        $forwardTimeSeconds = intval($forwardDays) * 24 * 60 * 60;
+        $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/waapi');
+
         $outages = array();
 
         if ((time() - $last_updated_cache) > $time_in_cache) {
 
             $queryDateTimeStart = date("Y-m-d") . "T" . date("H") . "%3A" . date("i") . "%3A00.000Z";
             $queryDateTimeStop = date("Y-m-d", time() + $forwardTimeSeconds) . "T" . date("H") . "%3A" . date("i") . "%3A00.000Z";
-            
+
             $CURLConnection = curl_init();
 
             foreach ($province as $provinceGAID) {
                 foreach ($district as $districtGAID) {
-                    if (!empty($commune)) {
-                        foreach ($commune as $communeGAID) {
-                            curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop . "&communeGAID=" . $communeGAID);
-                            curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
-                            $json = curl_exec($CURLConnection);
-                            $outages = array_merge_recursive($outages, json_decode($json, true));
-                        }
-                    }
-                    else {
-                            curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop);
-                            curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
-                            $json = curl_exec($CURLConnection);
-                            $outages = array_merge_recursive($outages, json_decode($json, true));
+                    foreach ($commune as $communeGAID) {
+                        curl_setopt($CURLConnection, CURLOPT_URL, $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop . "&communeGAID=" . $communeGAID);
+                        curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
+                        $json = curl_exec($CURLConnection);
+                        $outages = array_merge_recursive($outages, json_decode($json, true));
                     }
                 }
             }
@@ -99,10 +88,12 @@ class TauronPowerOutagesHandler
     public function accessTableInit()
     {
         $access = AccessRights::getInstance();
-        $access->insertPermission(new Permission(
-            'tauronpoweroutages_full_access',
-            trans('Tauron power outages'),
-            '^tauronpoweroutages$'
-        ), AccessRights::FIRST_FORBIDDEN_PERMISSION);
+        $access->insertPermission(
+            new Permission(
+                'tauronpoweroutages_full_access',
+                trans('Tauron power outages'),
+                '^tauronpoweroutages$'
+            ), AccessRights::FIRST_FORBIDDEN_PERMISSION
+        );
     }
 }
