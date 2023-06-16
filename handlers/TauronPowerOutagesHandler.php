@@ -17,8 +17,7 @@ class TauronPowerOutagesHandler
         array_unshift($hook_data, $plugin_modules);
         return $hook_data;
     }
-
-    public function welcomeTauronPowerOutages(array $hook_data = array())
+    public function welcomeTauronPowerOutages(array $hook_data = [])
     {
         $SMARTY = LMSSmarty::getInstance();
         $filename = ConfigHelper::getConfig('tauron.filename', 'tauron.json');
@@ -36,28 +35,25 @@ class TauronPowerOutagesHandler
         $forwardDays = intval(ConfigHelper::getConfig('tauron.forward_days', 7));
         $forwardTimeSeconds = $forwardDays * 24 * 60 * 60;
         $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/waapi');
-        $outages = array();
+        $outages = [];
 
         if ((time() - $last_updated_cache) > $time_in_cache) {
-            $queryDateTimeStart = date("Y-m-d") . "T" . date("H") . "%3A" . date("i") . "%3A00.000Z";
-            $queryDateTimeStop = date("Y-m-d", time() + $forwardTimeSeconds) . "T" . date("H") . "%3A" . date("i") . "%3A00.000Z";
+            $queryDateTimeStart = date("Y-m-d") . "T" . date("H:i:s") . ".000Z";
+            $queryDateTimeStop = date("Y-m-d", time() + $forwardTimeSeconds) . "T" . date("H:i:s") . ".000Z";
 
             $CURLConnection = curl_init();
 
             foreach ($province as $provinceGAID) {
                 foreach ($district as $districtGAID) {
-                    if ($communeGAID !== null) {
-                        foreach ($commune as $communeGAID) {
-                            $url = $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop . "&communeGAID=" . $communeGAID;
-                            curl_setopt($CURLConnection, CURLOPT_URL, $url);
-                            curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
-                            $json = curl_exec($CURLConnection);
-                            $outages = array_merge_recursive($outages, json_decode($json, true));
-                        }
-                    } else {
+                    foreach ($commune as $communeGAID) {
                         $url = $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop;
-                        curl_setopt($CURLConnection, CURLOPT_URL, $url);
-                        curl_setopt($CURLConnection, CURLOPT_RETURNTRANSFER, true);
+                        if ($communeGAID !== null) {
+                            $url .= "&communeGAID=" . $communeGAID;
+                        }
+                        curl_setopt_array($CURLConnection, [
+                            CURLOPT_URL => $url,
+                            CURLOPT_RETURNTRANSFER => true
+                        ]);
                         $json = curl_exec($CURLConnection);
                         $outages = array_merge_recursive($outages, json_decode($json, true));
                     }
@@ -67,28 +63,26 @@ class TauronPowerOutagesHandler
             curl_close($CURLConnection);
             $json = json_encode($outages);
 
-            if (!file_put_contents($filename, $json)) {
+            if (file_put_contents($filename, $json) === false) {
                 echo "Oops! Error creating json file $filename";
             }
         }
 
         $outages = json_decode(file_get_contents($filename), true);
-        $outageItems = isset($outages['OutageItems']) ? $outages['OutageItems'] : array();
+        $outageItems = $outages['OutageItems'] ?? [];
         $outagesCount = is_array($outageItems) ? count($outageItems) : 0;
 
         $SMARTY->assign(
             'tauron_power_outages',
-            array(
-                'outages' => $outages['OutageItems'],
+            [
+                'outages' => $outageItems,
                 'outages_count' => $outagesCount,
-                'last_updated_cache' => date("Y-m-d H:i:s", filemtime($filename)),
-            )
+                'last_updated_cache' => date("Y-m-d H:i:s", filemtime($filename))
+            ]
         );
 
         return $hook_data;
     }
-
-
 
     public function accessTableInit()
     {
