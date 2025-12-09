@@ -111,3 +111,8 @@ Do: 2024-01-15 14:00
 Obszar: ul. Przykładowa 1-10, miasto Knurów
 ```
 
+## Wsparcie
+
+Jeśli chcesz wesprzeć rozwój wtyczki, możesz postawić mi kawę:
+[buymeacoffee.com/lukasz.kopiszka](https://buymeacoffee.com/lukasz.kopiszka)
+
