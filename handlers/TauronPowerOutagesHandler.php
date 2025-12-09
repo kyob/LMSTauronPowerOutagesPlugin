@@ -19,65 +19,49 @@ class TauronPowerOutagesHandler
     }
     public function welcomeTauronPowerOutages(array $hook_data = [])
     {
+        require_once __DIR__ . '/../lib/TauronPowerOutagesFetcher.php';
+
         $SMARTY = LMSSmarty::getInstance();
+
+        $inlineRefresh = ConfigHelper::getConfig('tauron.inline_refresh', false);
+        $timeInCache = intval(ConfigHelper::getConfig('tauron.time_in_cache', 300));
         $filename = ConfigHelper::getConfig('tauron.filename', 'tauron.json');
-        $time_in_cache = ConfigHelper::getConfig('tauron.time_in_cache', 60);
+        $cachePath = TauronPowerOutagesFetcher::resolveCachePath($filename);
 
-        $last_updated_cache = 0;
-        if (file_exists($filename)) {
-            $last_updated_cache = filemtime($filename);
-        }
+        $cacheExists = file_exists($cachePath);
+        $lastUpdatedCache = $cacheExists ? filemtime($cachePath) : 0;
+        $cacheIsStale = (time() - $lastUpdatedCache) > $timeInCache;
 
-        $commune = explode(",", ConfigHelper::getConfig('tauron.commune'));
-        $district = explode(",", ConfigHelper::getConfig('tauron.district', '6'));
-        $province = explode(",", ConfigHelper::getConfig('tauron.province', '24'));
-
-        $forwardDays = intval(ConfigHelper::getConfig('tauron.forward_days', 7));
-        $forwardTimeSeconds = $forwardDays * 24 * 60 * 60;
-        $api_url = ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/waapi');
-        $outages = [];
-
-        if ((time() - $last_updated_cache) > $time_in_cache) {
-            $queryDateTimeStart = date("Y-m-d") . "T" . date("H:i:s") . ".000Z";
-            $queryDateTimeStop = date("Y-m-d", time() + $forwardTimeSeconds) . "T" . date("H:i:s") . ".000Z";
-
-            $CURLConnection = curl_init();
-
-            foreach ($province as $provinceGAID) {
-                foreach ($district as $districtGAID) {
-                    foreach ($commune as $communeGAID) {
-                        $url = $api_url . "/outages/area?provinceGAID=" . $provinceGAID . "&districtGAID=" . $districtGAID . "&fromDate=" . $queryDateTimeStart . "&toDate=" . $queryDateTimeStop;
-                        if ($communeGAID !== null) {
-                            $url .= "&communeGAID=" . $communeGAID;
-                        }
-                        curl_setopt_array($CURLConnection, [
-                            CURLOPT_URL => $url,
-                            CURLOPT_RETURNTRANSFER => true
-                        ]);
-                        $json = curl_exec($CURLConnection);
-                        $outages = array_merge_recursive($outages, json_decode($json, true));
-                    }
-                }
-            }
-
-            curl_close($CURLConnection);
-            $json = json_encode($outages);
-
-            if (file_put_contents($filename, $json) === false) {
-                echo "Oops! Error creating json file $filename";
+        if ($inlineRefresh && $cacheIsStale) {
+            // Best-effort, short-timeout refresh; failures do not block the page.
+            try {
+                TauronPowerOutagesFetcher::fetchAndCache([
+                    'province' => explode(",", ConfigHelper::getConfig('tauron.province', '24')),
+                    'district' => explode(",", ConfigHelper::getConfig('tauron.district', '6')),
+                    'commune' => explode(",", ConfigHelper::getConfig('tauron.commune', '')),
+                    'forward_days' => intval(ConfigHelper::getConfig('tauron.forward_days', 7)),
+                    'api_url' => ConfigHelper::getConfig('tauron.api_url', 'https://www.tauron-dystrybucja.pl/waapi'),
+                    'timeout' => intval(ConfigHelper::getConfig('tauron.timeout', 5)),
+                    'user_agent' => ConfigHelper::getConfig('tauron.user_agent', 'LMS-Tauron-Power-Outages'),
+                    'cache_path' => $cachePath,
+                ]);
+                $lastUpdatedCache = file_exists($cachePath) ? filemtime($cachePath) : $lastUpdatedCache;
+            } catch (Exception $e) {
+                // Do not break page rendering; leave cache as-is.
             }
         }
 
-        $outages = json_decode(file_get_contents($filename), true);
-        $outageItems = $outages['OutageItems'] ?? [];
+        $cache = TauronPowerOutagesFetcher::loadCache($cachePath);
+        $outageItems = $cache['items'];
         $outagesCount = is_array($outageItems) ? count($outageItems) : 0;
+        $lastUpdatedDate = $lastUpdatedCache ? date("Y-m-d H:i:s", $lastUpdatedCache) : '-';
 
         $SMARTY->assign(
             'tauron_power_outages',
             [
                 'outages' => $outageItems,
                 'outages_count' => $outagesCount,
-                'last_updated_cache' => date("Y-m-d H:i:s", filemtime($filename))
+                'last_updated_cache' => $lastUpdatedDate
             ]
         );
 

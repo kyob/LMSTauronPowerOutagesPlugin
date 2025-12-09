@@ -3,7 +3,8 @@
         <thead>
             <tr onclick="showOrHide('welcome_tauron');">
                 <th class="text-center">
-                    <i class="fas fa-bolt"></i> {trans('Power outages')} - ostatnia aktualizacja {$tauron_power_outages.last_updated_cache}
+                    <i class="fas fa-bolt"></i> {trans('Power outages')} - ostatnia aktualizacja
+                    {$tauron_power_outages.last_updated_cache}
                 </th>
             </tr>
         </thead>
@@ -26,14 +27,21 @@
                             </thead>
                             <tbody>
                                 {foreach $tauron_power_outages.outages as $item}
-                                    <tr class="highlight{if $item.StartDate|date_format:'%Y-%m-%d' == date('Y-m-d')} alert bold{/if}">
+                                    <tr
+                                        class="highlight{if $item.StartDate|date_format:'%Y-%m-%d' == date('Y-m-d')} alert bold{/if}">
                                         <td>{$item.StartDate|date_format:"%Y-%m-%d"}</td>
                                         <td>{$item.StartDate|date_format:"%H:%M"} - {$item.EndDate|date_format:"%H:%M"}</td>
-                                        <td>{$item.Message}</td>
+                                        <td>{$item.Message|escape}</td>
                                     </tr>
                                 {/foreach}
                             </tbody>
                         </table>
+                    </td>
+                </tr>
+            {else}
+                <tr>
+                    <td style="padding:1em;">
+                        Brak planowanych i awaryjnych wyłączeń.
                     </td>
                 </tr>
             {/if}
